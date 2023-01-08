@@ -1,107 +1,81 @@
 import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStreamReader;
-import java.util.*;
+import java.util.PriorityQueue;
+import java.util.StringTokenizer;
 
 public class Baekjoon_2583 {
-
+    static int[] px = {0,0,-1, 1};
+    static int[] py = {-1, 1, 0,0};
+    static boolean[][] visited;
     static int m;
     static int n;
-    static int[][] array;
-    static boolean[][] visited;
-    static int count;
-    static int Area = 0;
-    static int[] arrayX = {0,0,-1,1};
-    static int[] arrayY = {-1,1,0,0};
 
-    public static class Pos {
-        int x;
-        int y;
-        public Pos(int x, int y) {
-            this.x = x;
-            this.y = y;
-        }
-    }
+    public static int DFS(int x, int y)
+    {
+        int size = 1;
+        int newX, newY;
 
-    public static void bfs(int x, int y){
-        Area = 1;
+        for(int i = 0; i<4; i++){
+            newX = x+px[i];
+            newY = y+py[i];
 
-        Queue<Pos> queue = new LinkedList<>();
+            if(newX< 0 || newY<0 || newX>=m || newY>=n)
+                continue;
 
-        Pos pos = new Pos(x, y);
-        queue.add(pos);
-        visited[x][y] = true;
-
-        while(!queue.isEmpty()){
-            Pos poll = queue.poll();
-
-            for(int i = 0; i<4; i++)
+            if(visited[newX][newY] == false)
             {
-                int newX = poll.x + arrayX[i];
-                int newY = poll.y + arrayY[i];
-
-                if(newX < 0 || newY <0 || newX>=m || newY>=n)
-                    continue;
-
-                if(array[newX][newY] !=1 && visited[newX][newY] == false)
-                {
-                    Pos newPos = new Pos(newX, newY);
-                    queue.add(newPos);
-                    visited[newX][newY] = true;
-                    Area++;
-                }
+                visited[newX][newY] = true;
+                size += DFS(newX, newY);
             }
         }
-        count++;
+
+        return size;
     }
 
     public static void main(String[] args) throws IOException {
+        int count =0;
+
         BufferedReader br = new BufferedReader(new InputStreamReader(System.in));
         StringTokenizer st = new StringTokenizer(br.readLine());
-        ArrayList<Integer> AreaList = new ArrayList<>();
+        StringBuilder sb = new StringBuilder();
 
         m = Integer.parseInt(st.nextToken());
         n = Integer.parseInt(st.nextToken());
         int k = Integer.parseInt(st.nextToken());
 
-        array = new int[m][n];
         visited = new boolean[m][n];
+        PriorityQueue<Integer> queue = new PriorityQueue<>();
 
+        int lx, ly, rx, ry;
         for(int i = 0; i<k; i++){
-            st = new StringTokenizer(br.readLine());
+            st =  new StringTokenizer(br.readLine());
 
-            int lx = Integer.parseInt(st.nextToken());
-            int ly = m - (Integer.parseInt(st.nextToken()) + 1);
-            int rx= Integer.parseInt(st.nextToken()) -1;
-            int ry = m - Integer.parseInt(st.nextToken());
+            lx = Integer.parseInt(st.nextToken());
+            ly = Integer.parseInt(st.nextToken());
+            rx = Integer.parseInt(st.nextToken());
+            ry = Integer.parseInt(st.nextToken());
 
-            array[ly][lx] = 1;
-            array[ry][rx] = 1;
-
-            for(int s = lx; s <= rx; s++){
-                for(int t = ly; t>=ry; t-- )
-                    if(array[t][s] != 1 && visited[t][s] == false){
-                        array[t][s] = 1;
-                        visited[t][s] = true;
-                    }
+            for(int s = ly; s<ry; s++){
+                for(int t = lx; t<rx; t++)
+                    visited[s][t] = true;
             }
         }
 
-        for(int i = 0; i<m; i++){
+        for(int i = 0; i<m; i++) {
             for(int j = 0; j<n; j++){
-                if(array[i][j] != 1 && visited[i][j] == false)
-                {
-                    bfs(i, j);
-                    AreaList.add(Area);
+                if(!visited[i][j]){
+                    visited[i][j] = true;
+                    queue.add(DFS(i,j));
+                    count++;
                 }
             }
         }
 
-        System.out.println(count);
-        Collections.sort(AreaList);
+        sb.append(count).append("\n");
+        while (!queue.isEmpty())
+            sb.append(queue.poll()).append(" ");
 
-        for (int i : AreaList) {
-            System.out.print(i+" ");
-        }
+        System.out.println(sb);
     }
 }
