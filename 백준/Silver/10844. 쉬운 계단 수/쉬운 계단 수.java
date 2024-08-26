@@ -16,14 +16,10 @@ public class Main {
 		}
 
 		for (int i = 2; i <= n; i++) {
-			for (int j = 0; j < 10; j++) {
-				if (j == 0) {
-					dp[i][j] = dp[i - 1][1] % mod;
-				} else if (j == 9) {
-					dp[i][j] = dp[i - 1][8] % mod;
-				} else{
-					dp[i][j] = (dp[i-1][j-1] + dp[i-1][j+1])%mod;
-				}
+			dp[i][0] = dp[i - 1][1];
+			dp[i][9] = dp[i - 1][8];
+			for (int j = 1; j < 9; j++) {
+				dp[i][j] = (dp[i - 1][j - 1] + dp[i - 1][j + 1]) % mod;
 			}
 		}
 
